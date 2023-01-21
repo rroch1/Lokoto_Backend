@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -28,6 +30,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $firstName = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $lastName = null;
+
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Vehicule::class)]
+    private Collection $vehicules;
+
+    public function __construct()
+    {
+        $this->vehicules = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -111,5 +127,59 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(?string $firstName): self
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(?string $lastName): self
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Vehicule>
+     */
+    public function getVehicules(): Collection
+    {
+        return $this->vehicules;
+    }
+
+    public function addVehicule(Vehicule $vehicule): self
+    {
+        if (!$this->vehicules->contains($vehicule)) {
+            $this->vehicules->add($vehicule);
+            $vehicule->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVehicule(Vehicule $vehicule): self
+    {
+        if ($this->vehicules->removeElement($vehicule)) {
+            // set the owning side to null (unless already changed)
+            if ($vehicule->getOwner() === $this) {
+                $vehicule->setOwner(null);
+            }
+        }
+
+        return $this;
     }
 }

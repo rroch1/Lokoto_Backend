@@ -32,10 +32,4 @@ class ApiLoginController extends AbstractController
         // Le bundle JTW génère tout seul une réponse avec le token à l'intérieur
         return $this->json('');
     }
-
-    #[Route('/api/logout', name: 'app_api_logout')]
-    public function logout()
-    {
-        throw new \Exception('should not be reached');
-    }
 }
