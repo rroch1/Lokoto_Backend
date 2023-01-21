@@ -8,11 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-#[ApiResource(itemOperations: [
-    'get' => ['access_control' => 'is_granted(\'ROLE_ADMIN\''],
-    'put' => ['access_control' => 'is_granted(\'ROLE_ADMIN\''],
-    'delete' => ['access_control' => 'is_granted(\'ROLE_ADMIN\'']
-])]
+#[ApiResource]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
