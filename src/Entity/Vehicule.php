@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\VehiculeRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: VehiculeRepository::class)]
@@ -39,6 +41,18 @@ class Vehicule
     #[ORM\ManyToOne(inversedBy: 'vehicules')]
     #[ORM\JoinColumn(nullable: true)]
     private ?User $owner = null;
+
+    #[ORM\OneToMany(mappedBy: 'reservedVehicule', targetEntity: Reservation::class)]
+    private Collection $reservations;
+
+    #[ORM\OneToMany(mappedBy: 'vehicule', targetEntity: VehiculeKey::class, orphanRemoval: true)]
+    private Collection $vehiculeKeys;
+
+    public function __construct()
+    {
+        $this->reservations = new ArrayCollection();
+        $this->vehiculeKeys = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -137,6 +151,66 @@ class Vehicule
     public function setOwner(?User $owner): self
     {
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Reservation>
+     */
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
+    }
+
+    public function addReservation(Reservation $reservation): self
+    {
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->setReservedVehicule($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReservation(Reservation $reservation): self
+    {
+        if ($this->reservations->removeElement($reservation)) {
+            // set the owning side to null (unless already changed)
+            if ($reservation->getReservedVehicule() === $this) {
+                $reservation->setReservedVehicule(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, VehiculeKey>
+     */
+    public function getVehiculeKeys(): Collection
+    {
+        return $this->vehiculeKeys;
+    }
+
+    public function addVehiculeKey(VehiculeKey $vehiculeKey): self
+    {
+        if (!$this->vehiculeKeys->contains($vehiculeKey)) {
+            $this->vehiculeKeys->add($vehiculeKey);
+            $vehiculeKey->setVehicule($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVehiculeKey(VehiculeKey $vehiculeKey): self
+    {
+        if ($this->vehiculeKeys->removeElement($vehiculeKey)) {
+            // set the owning side to null (unless already changed)
+            if ($vehiculeKey->getVehicule() === $this) {
+                $vehiculeKey->setVehicule(null);
+            }
+        }
 
         return $this;
     }

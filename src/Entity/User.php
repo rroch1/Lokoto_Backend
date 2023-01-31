@@ -40,9 +40,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Vehicule::class)]
     private Collection $vehicules;
 
+    #[ORM\ManyToMany(targetEntity: Reservation::class, mappedBy: 'members')]
+    private Collection $reservations;
+
     public function __construct()
     {
         $this->vehicules = new ArrayCollection();
+        $this->reservations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -178,6 +182,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             if ($vehicule->getOwner() === $this) {
                 $vehicule->setOwner(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Reservation>
+     */
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
+    }
+
+    public function addReservation(Reservation $reservation): self
+    {
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->addMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReservation(Reservation $reservation): self
+    {
+        if ($this->reservations->removeElement($reservation)) {
+            $reservation->removeMember($this);
         }
 
         return $this;
