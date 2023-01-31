@@ -1,0 +1,5 @@
+App\Entity\Reservation:
+  reservation_{1..100}:
+    dateTimeStart: <dateTimeImmutable()>
+    dateTimeStop: <dateTimeImmutable()>
+    informations: <text()>

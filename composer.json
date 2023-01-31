@@ -81,6 +81,7 @@
         }
     },
     "require-dev": {
+        "hautelook/alice-bundle": "^2.11",
         "symfony/maker-bundle": "^1.48",
         "symfony/stopwatch": "5.4.*",
         "symfony/web-profiler-bundle": "5.4.*"
